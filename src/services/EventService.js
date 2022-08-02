@@ -19,5 +19,8 @@ export default {
   },
   searchEvents (text) {
     return apiClient.get(`/posts?q=${text}`)
+  },
+  deleteEvent (id) {
+    return apiClient.delete(`/posts/${id}`)
   }
 }

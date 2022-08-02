@@ -1,5 +1,10 @@
 <template>
 <div class="container is-fluid">
+  <ModalConfirm 
+    :class="[ isModalOpen ? activeClass : '']"
+    :id="selectedID"
+    @closeModal="toggleModal(false)"
+    @deleteEvent="deleteEvent()"/>
       <div class="level-item notification is-primary">
       <div class="field has-addons">
         <p class="control">
@@ -11,10 +16,14 @@
           </button>
         </p>
       </div>
-    </div>
+    </div >
       <div class="section">
         <template v-if="posts.length">
-        <PostSummary v-for="post in posts" :key="post.id">
+        <PostSummary v-for="post in posts"
+        :id="post.id"
+        :key="post.id" 
+        @openConfirmModal="toggleModal($event, true)"
+        >
           <template v-slot:title>
             {{post.title}}
           </template>
@@ -41,30 +50,47 @@
 import EventService from '../services/EventService'
 import PostSummary from '../components/PostSummary.vue'
 import NoPosts from '../components/NoPosts.vue'
+import ModalConfirm from '@/components/ModalConfirm.vue'
+import { fetchPostsMixin, deletePostMixin } from '../mixins/fetchPostMixin'
+
 
 export default {
   components: {
     PostSummary,
-    NoPosts
+    NoPosts,
+    ModalConfirm
   },
+  mixins: [fetchPostsMixin, deletePostMixin],
   data () {
     return {
       name: 'PostPage',
       posts: [],
-      searchInput: ''
+      searchInput: '',
+      activeClass: 'is-active',
+      selectedID: 0,
+      isModalOpen: false
     }
   },
   methods: {
     search () {
-      console.log(this.searchInput)
-      // const regex = new RegExp(this.searchInput)
-      // this.posts = this.posts.filter(post =>  regex.test(post.body) || regex.test(post.author) )
-    EventService.searchEvents(this.searchInput).then(res => { this.posts = res.data }).catch(err => console.log(err))
-    console.log(this.posts)
-    }
+      EventService.searchEvents(this.searchInput)
+      .then(res => { this.posts = res.data })
+      .catch(err => console.log(err))
+    },
+    // deleteEvent (id) {
+    //   console.log('deleting id', id)
+    //   // EventService.deleteEvent(id)
+    // },
+    toggleModal(event, boolean) {
+      this.selectedID = event
+      this.isModalOpen = boolean
+  }
   },
   created () {
-    EventService.fetchEvents().then(res => { this.posts = res.data }).catch(err => console.log(err))
+    this.fetchMethod()
+    // EventService.fetchEvents()
+    // .then(res => { this.posts = res.data })
+    // .catch(err => console.log(err))
   }
 }
 </script>

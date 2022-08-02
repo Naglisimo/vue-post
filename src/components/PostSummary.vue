@@ -1,4 +1,5 @@
 <template>
+<div>
 <div class="card">
   <header class="card-header">
     <p class="card-header-title">
@@ -13,31 +14,24 @@
   <div class="card-content">
     <div class="content">
       <slot name="author"></slot>
-      <a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>
-      <br>
       <time datetime="2016-1-1">
         <slot name="time"></slot>
       </time>
     </div>
   </div>
   <footer class="card-footer">
-    <a href="#" class="card-footer-item">Save</a>
-    <a href="#" class="card-footer-item">Edit</a>
-    <a href="#" class="card-footer-item">Delete</a>
+    <a href="#" class="card-footer-item">Read</a>
+    <a href="#" class="card-footer-item" @click="$emit('openModal', id)">Edit</a>
+    <a href="#" class="card-footer-item" @click="$emit('openConfirmModal', id)">Delete</a>
   </footer>
+</div>
 </div>
 </template>
 
 <script>
+
+
 export default {
-  data () {
-    return {
-      data: 'labas'
-    }
-  }
+  props: [ 'id' ]
 }
 </script>
-
-<style scoped>
-
-</style>
