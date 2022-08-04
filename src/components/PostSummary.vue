@@ -13,6 +13,7 @@
   </header>
   <div class="card-content">
     <div class="content">
+      <slot v-if="path !== '/'" name="body"></slot>
       <slot name="author"></slot>
       <time datetime="2016-1-1">
         <slot name="time"></slot>
@@ -20,8 +21,9 @@
     </div>
   </div>
   <footer class="card-footer">
-    <a href="#" class="card-footer-item">Read</a>
-    <a href="#" class="card-footer-item" @click="$emit('openModal', id)">Edit</a>
+    <router-link v-if="path !== '/'" :to="{ name: 'home'}" class="card-footer-item">Back</router-link>
+    <router-link v-else :to="{ name: 'post', params: { id: id }}" class="card-footer-item">Read</router-link>
+    <a href="#" class="card-footer-item" @click="$emit('openAddEdit', id)">Edit</a>
     <a href="#" class="card-footer-item" @click="$emit('openConfirmModal', id)">Delete</a>
   </footer>
 </div>
@@ -30,8 +32,16 @@
 
 <script>
 
-
 export default {
-  props: [ 'id' ]
+  props: [ 'id' ],
+  data () {
+    return {
+      path: ''
+    }
+  },
+  created () {
+    this.path = this.$route.path
+    console.log(this.$route.path)
+  }
 }
 </script>

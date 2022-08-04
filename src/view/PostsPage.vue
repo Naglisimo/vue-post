@@ -1,12 +1,21 @@
 <template>
 <div class="container is-fluid">
-  <ModalConfirm 
-    :class="[ isModalOpen ? activeClass : '']"
+  <ModalAddEdit 
+    :class="[ isEditOpen ? activeClass : '']"
     :id="selectedID"
-    @closeModal="toggleModal(false)"
-    @deleteEvent="deleteEvent()"/>
-      <div class="level-item notification is-primary">
-      <div class="field has-addons">
+    @closeModal="toggleOpenEdit(false)"
+    @deletePost="deletePost($event)"/>
+      <div class=" navbar level notification is-size-5 is-primary is-fixed-top">
+    <!-- <div class="notification is-warning">
+      <h1>Are you sure, you want to delete this? </h1>
+      <button>Delete</button>
+      <button @click="deleteSmthng">Cancel</button>
+      </div> -->
+
+      <div>
+        <button class="button is-info is-light  "> <font-awesome-icon icon="fa-solid fa-user-secret" />hahaha mazafaka </button>
+      </div>
+      <div class="field has-addons ">
         <p class="control">
           <input @onChange="search" class="input" type="text" placeholder="Find a post" v-model="searchInput">
         </p>
@@ -16,13 +25,21 @@
           </button>
         </p>
       </div>
-    </div >
+    </div>
+        <NotificationConfirm 
+        v-if="isNotificationOpen"
+    :id="selectedID"
+    @closeNotification="toggleModal(false)"
+    @deletePost="deletePost($event)"
+    />
+
       <div class="section">
         <template v-if="posts.length">
         <PostSummary v-for="post in posts"
         :id="post.id"
         :key="post.id" 
         @openConfirmModal="toggleModal($event, true)"
+        @openAddEdit="toggleOpenEdit($event, true)"
         >
           <template v-slot:title>
             {{post.title}}
@@ -50,15 +67,23 @@
 import EventService from '../services/EventService'
 import PostSummary from '../components/PostSummary.vue'
 import NoPosts from '../components/NoPosts.vue'
-import ModalConfirm from '@/components/ModalConfirm.vue'
+import ModalAddEdit from '@/components/ModalAddEdit.vue'
+import NotificationConfirm from '@/components/NotificationConfirm.vue';
 import { fetchPostsMixin, deletePostMixin } from '../mixins/fetchPostMixin'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
 
+import { faHatWizard } from '@fortawesome/free-solid-svg-icons'
+
+library.add(faHatWizard)
 
 export default {
   components: {
     PostSummary,
     NoPosts,
-    ModalConfirm
+    ModalAddEdit,
+    FontAwesomeIcon,
+    NotificationConfirm
   },
   mixins: [fetchPostsMixin, deletePostMixin],
   data () {
@@ -68,7 +93,8 @@ export default {
       searchInput: '',
       activeClass: 'is-active',
       selectedID: 0,
-      isModalOpen: false
+      isNotificationOpen: false,
+      isEditOpen: false
     }
   },
   methods: {
@@ -77,14 +103,22 @@ export default {
       .then(res => { this.posts = res.data })
       .catch(err => console.log(err))
     },
+    deleteSmthng () {
+      this.$notification.parentNode.removeChild(this.$notification);
+      console.log('deletesomething')
+    },
     // deleteEvent (id) {
     //   console.log('deleting id', id)
     //   // EventService.deleteEvent(id)
     // },
-    toggleModal(event, boolean) {
+    toggleOpenEdit(event, boolean) {
+      console.log('cliiiicked', event, boolean)
       this.selectedID = event
-      this.isModalOpen = boolean
-  }
+      this.isEditOpen = boolean
+  },
+    toggleNotification () {
+
+    }
   },
   created () {
     this.fetchMethod()
