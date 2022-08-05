@@ -68,6 +68,7 @@ import EventService from '../services/EventService'
         }
         console.log(event)
         EventService.createEvent(event).then(res => console.log(res)).catch(err => console.log(err))
+        this.$emit('closeModal')
       }
     }
   }
