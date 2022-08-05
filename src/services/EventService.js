@@ -22,5 +22,8 @@ export default {
   },
   deleteEvent (id) {
     return apiClient.delete(`/posts/${id}`)
+  },
+  createEvent (event) {
+    return apiClient.post(`/posts`, event)
   }
 }

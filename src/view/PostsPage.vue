@@ -1,19 +1,15 @@
 <template>
 <div class="container is-fluid">
   <ModalAddEdit 
-    :class="[ isEditOpen ? activeClass : '']"
+    :class="[ isEditOpen ? 'is-active' : '']"
     :id="selectedID"
     @closeModal="toggleOpenEdit(false)"
     @deletePost="deletePost($event)"/>
       <div class=" navbar level notification is-size-5 is-primary is-fixed-top">
-    <!-- <div class="notification is-warning">
-      <h1>Are you sure, you want to delete this? </h1>
-      <button>Delete</button>
-      <button @click="deleteSmthng">Cancel</button>
-      </div> -->
-
       <div>
-        <button class="button is-info is-light  "> <font-awesome-icon icon="fa-solid fa-user-secret" />hahaha mazafaka </button>
+        <button 
+          class="button is-info is-light"
+          @click="toggleOpenEdit(0, true)"> Add new post </button>
       </div>
       <div class="field has-addons ">
         <p class="control">
@@ -27,18 +23,18 @@
       </div>
     </div>
         <NotificationConfirm 
-        v-if="isNotificationOpen"
+        :class="[ isNotificationOpen ? 'is-active' : '']"
     :id="selectedID"
-    @closeNotification="toggleModal(false)"
+    @closeNotification="toggleNotification(false)"
     @deletePost="deletePost($event)"
     />
 
-      <div class="section">
+      <div class="section mt-6">
         <template v-if="posts.length">
         <PostSummary v-for="post in posts"
         :id="post.id"
         :key="post.id" 
-        @openConfirmModal="toggleModal($event, true)"
+        @openConfirmModal="toggleNotification($event, true)"
         @openAddEdit="toggleOpenEdit($event, true)"
         >
           <template v-slot:title>
@@ -68,9 +64,8 @@ import EventService from '../services/EventService'
 import PostSummary from '../components/PostSummary.vue'
 import NoPosts from '../components/NoPosts.vue'
 import ModalAddEdit from '@/components/ModalAddEdit.vue'
-import NotificationConfirm from '@/components/NotificationConfirm.vue';
+import NotificationConfirm from '@/components/NotificationConfirm.vue'
 import { fetchPostsMixin, deletePostMixin } from '../mixins/fetchPostMixin'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 
 import { faHatWizard } from '@fortawesome/free-solid-svg-icons'
@@ -82,7 +77,6 @@ export default {
     PostSummary,
     NoPosts,
     ModalAddEdit,
-    FontAwesomeIcon,
     NotificationConfirm
   },
   mixins: [fetchPostsMixin, deletePostMixin],
@@ -91,7 +85,6 @@ export default {
       name: 'PostPage',
       posts: [],
       searchInput: '',
-      activeClass: 'is-active',
       selectedID: 0,
       isNotificationOpen: false,
       isEditOpen: false
@@ -112,12 +105,19 @@ export default {
     //   // EventService.deleteEvent(id)
     // },
     toggleOpenEdit(event, boolean) {
-      console.log('cliiiicked', event, boolean)
+      console.log(event, 'event', boolean, 'bool')
+      if (event) {
       this.selectedID = event
       this.isEditOpen = boolean
+      } else {
+      this.selectedID = 0
+      this.isEditOpen = boolean
+      }
   },
-    toggleNotification () {
-
+    toggleNotification (event, boolean) {
+      console.log('click', event, boolean)
+      this.isNotificationOpen = boolean
+      this.selectedID = event
     }
   },
   created () {

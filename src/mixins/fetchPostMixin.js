@@ -16,7 +16,7 @@ export const deletePostMixin = {
     deletePost (id) {
       EventService.deleteEvent(id)
         .then(() => {
-          this.isModalOpen = false
+          this.isNotificationOpen = false
           this.fetchMethod()
         })
     }
