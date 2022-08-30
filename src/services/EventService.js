@@ -25,5 +25,8 @@ export default {
   },
   createEvent (event) {
     return apiClient.post(`/posts`, event)
+  },
+  updateEvent (id, event) {
+    return apiClient.put(`/posts/${id}`, event)
   }
 }

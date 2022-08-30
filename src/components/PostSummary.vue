@@ -41,7 +41,6 @@ export default {
   },
   created () {
     this.path = this.$route.path
-    console.log(this.$route.path)
   }
 }
 </script>

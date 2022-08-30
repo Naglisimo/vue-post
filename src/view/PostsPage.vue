@@ -22,6 +22,7 @@
         </p>
       </div>
     </div>
+    <input type="email" placeholder="What's your email" v-model="email"/>
         <NotificationConfirm 
         :class="[ isNotificationOpen ? 'is-active' : '']"
     :id="selectedID"
@@ -87,7 +88,8 @@ export default {
       searchInput: '',
       selectedID: 0,
       isNotificationOpen: false,
-      isEditOpen: false
+      isEditOpen: false,
+      email: null
     }
   },
   methods: {
