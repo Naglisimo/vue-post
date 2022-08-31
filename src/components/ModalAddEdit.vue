@@ -56,7 +56,10 @@
 
     </section>
     <footer class="modal-card-foot">
-      <button class="button is-success" @click="submitPost">Save post</button>
+      <button
+        class="button is-success"
+        @click="submitPost"
+        :disabled="$v.$invalid">Save post</button>
       <button class="button" @click="$emit('closeModal')">Cancel</button>
     </footer>
   </div>

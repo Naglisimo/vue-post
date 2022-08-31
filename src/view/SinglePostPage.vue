@@ -1,6 +1,8 @@
 <template>
     <div class="section">
-        <PostSummary>
+        <PostSummary
+        @openConfirmModal="toggleNotification($event, true)"
+        :id="id">
           <template v-slot:title>
             {{post.title}}
           </template>
@@ -14,28 +16,47 @@
             {{post.updated_at ? post.updated_at : post.created_at}}
           </template>
         </PostSummary>
+        <NotificationConfirm 
+        :class="[ isNotificationOpen ? 'is-active' : '']"
+        :id="id"
+        @closeConfirmModal="toggleNotification($event, false)"
+        @deletePost="deletePost($event)"
+        />
     </div>
 </template>
 
 <script>
 import EventService from '../services/EventService'
-import PostSummary from '@/components/PostSummary.vue';
+import PostSummary from '@/components/PostSummary.vue'
+import NotificationConfirm from '@/components/NotificationConfirm.vue'
+import { deletePostMixin } from '../mixins/fetchPostMixin'
 
 export default {
   components: {
-    PostSummary
+    PostSummary,
+    NotificationConfirm
   },
+  mixins: [deletePostMixin],
   props: {
     id: [Number, String]
   },
   data () {
     return {
       name: 'SinglePostPage',
-      post: []
+      post: [],
+      isNotificationOpen: false
     }
   },
-  created () {
-    return EventService.fetchEvent(this.id).then(res => this.post =res.data)
+  methods: {
+      toggleNotification (event, boolean) {
+      console.log('click', event, boolean)
+      this.isNotificationOpen = boolean
+      this.selectedID = event
+    }
+  },
+  async created () {
+    const res = await EventService.fetchEvent(this.id)
+    return this.post=res.data
   }
 }
 </script>

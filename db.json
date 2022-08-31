@@ -18,18 +18,18 @@
   ],
   "posts": [
     {
-      "title": "Po juodaragio",
-      "author": "Naglis Kontrimas",
-      "body": "Grįžau iš pio Juodaragio",
-      "created_at": "2022-8-1",
-      "id": 12
+      "title": "asdasd",
+      "author": "asdasda",
+      "body": "sasdasdas",
+      "created_at": "2022-8-3",
+      "id": 1
     },
     {
-      "title": "Something new",
-      "author": "Naglis",
-      "body": "Kazkas naujo ",
-      "created_at": "2022-8-2",
-      "id": 13
+      "title": "asdasd",
+      "author": "asdasda",
+      "body": "sasdasdas",
+      "created_at": "2022-8-3",
+      "id": 3
     }
   ]
 }

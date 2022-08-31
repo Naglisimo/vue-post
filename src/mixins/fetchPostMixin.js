@@ -1,3 +1,4 @@
+import router from "@/router"
 import EventService from "@/services/EventService"
 
 export const fetchPostsMixin = {
@@ -15,9 +16,15 @@ export const deletePostMixin = {
   methods: {
     deletePost (id) {
       EventService.deleteEvent(id)
-        .then(() => {
-          this.isNotificationOpen = false
-          this.fetchMethod()
+        .then((res) => {
+          console.log(res)
+          console.log(this.$route.name)
+          if (this.$route.name !== 'home') {
+            router.push({ name: 'home' })
+          } else {
+            this.isNotificationOpen = false
+            this.fetchMethod()
+          }
         })
     }
   }

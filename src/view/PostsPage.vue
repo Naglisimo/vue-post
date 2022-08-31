@@ -1,5 +1,6 @@
 <template>
 <div class="container is-fluid">
+  posts page
   <ModalAddEdit 
     :class="[ isEditOpen ? 'is-active' : '']"
     :id="selectedID"
@@ -22,14 +23,12 @@
         </p>
       </div>
     </div>
-    <input type="email" placeholder="What's your email" v-model="email"/>
         <NotificationConfirm 
         :class="[ isNotificationOpen ? 'is-active' : '']"
-    :id="selectedID"
-    @closeNotification="toggleNotification(false)"
-    @deletePost="deletePost($event)"
-    />
-
+        :id="selectedID"
+        @closeConfirmModal="toggleNotification($event, false)"
+        @deletePost="deletePost($event)"
+        />
       <div class="section mt-6">
         <template v-if="posts.length">
         <PostSummary v-for="post in posts"

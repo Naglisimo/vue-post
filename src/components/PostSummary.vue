@@ -27,6 +27,7 @@
     <a href="#" class="card-footer-item" @click="$emit('openConfirmModal', id)">Delete</a>
   </footer>
 </div>
+
 </div>
 </template>
 
@@ -36,11 +37,13 @@ export default {
   props: [ 'id' ],
   data () {
     return {
-      path: ''
+      path: '',
+      isNotificationOpen: false,
     }
   },
   created () {
     this.path = this.$route.path
+    console.log('created post summary with id', this.id)
   }
 }
 </script>
