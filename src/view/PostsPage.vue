@@ -29,6 +29,12 @@
         @closeConfirmModal="toggleNotification($event, false)"
         @deletePost="deletePost($event)"
         />
+        <NotificationInfo
+        :modalClass="[ isInfoOpen ? 'is-active' : '']"
+        :type="[ isInfoPrimary ? 'notification is-primary' : 'notification is-danger']">
+        <template v-if="isInfoPrimary === true" v-slot:text> Deleted successfully! </template>
+        <template v-else v-slot:text> Failed to delete! </template>
+        </NotificationInfo>
       <div class="section mt-6">
         <template v-if="posts.length">
         <PostSummary v-for="post in posts"
@@ -61,10 +67,11 @@
 
 <script>
 import EventService from '../services/EventService'
-import PostSummary from '../components/PostSummary.vue'
-import NoPosts from '../components/NoPosts.vue'
-import ModalAddEdit from '@/components/ModalAddEdit.vue'
-import NotificationConfirm from '@/components/NotificationConfirm.vue'
+import PostSummary from '../components/PostSummary'
+import NoPosts from '../components/NoPosts'
+import ModalAddEdit from '@/components/ModalAddEdit'
+import NotificationConfirm from '@/components/NotificationConfirm'
+import NotificationInfo from '@/components/NotificationInfo'
 import { fetchPostsMixin, deletePostMixin } from '../mixins/fetchPostMixin'
 import { library } from '@fortawesome/fontawesome-svg-core'
 
@@ -77,7 +84,8 @@ export default {
     PostSummary,
     NoPosts,
     ModalAddEdit,
-    NotificationConfirm
+    NotificationConfirm,
+    NotificationInfo
   },
   mixins: [fetchPostsMixin, deletePostMixin],
   data () {
@@ -88,7 +96,9 @@ export default {
       selectedID: 0,
       isNotificationOpen: false,
       isEditOpen: false,
-      email: null
+      email: null,
+      isInfoOpen: false,
+      isInfoPrimary: true
     }
   },
   methods: {

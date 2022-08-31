@@ -25,6 +25,20 @@ export const deletePostMixin = {
             this.isNotificationOpen = false
             this.fetchMethod()
           }
+          this.isInfoOpen = true
+          this.isInfoPrimary = true
+          setTimeout(() => {
+            this.isInfoOpen = false
+            this.isInfoPrimary = false
+          }, 2000)
+        })
+        .catch(() => {
+          this.isInfoOpen = true
+          this.isInfoPrimary = false
+          setTimeout(() => {
+            this.isInfoOpen = false
+            this.isInfoPrimary = false
+          }, 2000)
         })
     }
   }
