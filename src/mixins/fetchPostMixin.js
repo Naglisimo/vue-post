@@ -94,12 +94,12 @@ export const notificationMixin = {
       }, 2000)
     },
     openNotificationDanger (notificationText) {
-      console.log('danger')
+      console.log('danger function')
       this.notificationText = notificationText
-      this.isInfoOpen = true
+      this.deleteNotification = true
       this.isInfoPrimary = false
       setTimeout(() => {
-        this.isInfoOpen = false
+        this.deleteNotification = false
         this.isInfoPrimary = false
       }, 2000)
     },
