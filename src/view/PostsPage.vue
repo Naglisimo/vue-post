@@ -1,141 +1,149 @@
 <template>
-<div class="container is-fluid">
-  posts page
-  <ModalAddEdit 
-    :class="[ isEditOpen ? 'is-active' : '']"
-    :id="selectedID"
-    @closeModal="toggleOpenEdit(false)"
-    @deletePost="deletePost($event)"/>
-      <div class=" navbar level notification is-size-5 is-primary is-fixed-top">
-      <div>
-        <button 
-          class="button is-info is-light"
-          @click="toggleOpenEdit(0, true)"> Add new post </button>
+  <div class="container is-fluid">
+    posts page
+    <ModalAddEdit 
+      :class="[ isEditOpen ? 'is-active' : '']"
+      :id="selectedID"
+      @closeModal="toggleOpenEdit(false)"
+      @deletePost="deletePost($event)"
+      @fetchData="fetchMethod()"
+      @alertPrimary="openNotificationPrimary($event)"
+      @alertDanger="openNotificationDanger($event)"/>
+        <div class=" navbar level notification is-size-5 is-primary is-fixed-top">
+        <div>
+          <button 
+            class="button is-info is-light"
+            @click="toggleOpenEdit(0, true)"> Add new post </button>
+        </div>
+        <div class="field has-addons ">
+          <p class="control">
+            <input @onChange="search" class="input" type="text" placeholder="Find a post" v-model="searchInput">
+          </p>
+          <p class="control">
+            <button class="button" @click="search">
+              Search
+            </button>
+          </p>
+        </div>
       </div>
-      <div class="field has-addons ">
-        <p class="control">
-          <input @onChange="search" class="input" type="text" placeholder="Find a post" v-model="searchInput">
-        </p>
-        <p class="control">
-          <button class="button" @click="search">
-            Search
-          </button>
-        </p>
-      </div>
-    </div>
-        <NotificationConfirm 
-        :class="[ isNotificationOpen ? 'is-active' : '']"
-        :id="selectedID"
-        @closeConfirmModal="toggleNotification($event, false)"
-        @deletePost="deletePost($event)"
-        />
-        <NotificationInfo
-        :modalClass="[ isInfoOpen ? 'is-active' : '']"
-        :type="[ isInfoPrimary ? 'notification is-primary' : 'notification is-danger']">
-        <template v-if="isInfoPrimary === true" v-slot:text> Deleted successfully! </template>
-        <template v-else v-slot:text> Failed to delete! </template>
-        </NotificationInfo>
-      <div class="section mt-6">
-        <template v-if="posts.length">
-        <PostSummary v-for="post in posts"
-        :id="post.id"
-        :key="post.id" 
-        @openConfirmModal="toggleNotification($event, true)"
-        @openAddEdit="toggleOpenEdit($event, true)"
-        >
-          <template v-slot:title>
-            {{post.title}}
-          </template>
-          <template v-slot:author>
-            {{post.author}}
-          </template>
-          <template v-slot:time>
-            {{post.updated_at ? post.updated_at : post.created_at}}
-          </template>
-          </PostSummary>
-        </template>
-        <template v-else>
-          <NoPosts>
-            <template v-slot:text>
-              There is no available posts, <router-link :to="{ name: 'home' }"> let's go back!</router-link>
+          <NotificationConfirm 
+          :class="isNotificationOpen ? 'is-active' : ''"
+          :id="selectedID"
+          @closeConfirmModal="toggleNotification($event, false)"
+          @deletePost="deletePost($event)"
+          />
+          <NotificationInfo
+          :modalClass="deleteNotification ? 'is-active' : ''"
+          :type="isInfoPrimary ? 'notification is-primary' : 'notification is-danger'">
+          <template v-slot:text> {{ notificationText }} </template>
+          </NotificationInfo>
+          <NotificationInfo
+          :modalClass="addEditNotification ? 'is-active' : ''"
+          :type="isInfoPrimary ? 'notification is-primary' : 'notification is-danger'">
+          <template v-slot:text> {{ notificationText }} </template>
+          </NotificationInfo>
+        <div class="section mt-6">
+          <template v-if="posts.length">
+          <PostSummary v-for="post in posts"
+          :id="post.id"
+          :key="post.id" 
+          @openConfirmModal="toggleNotification($event, true)"
+          @openAddEdit="toggleOpenEdit($event, true)"
+          
+          >
+            <template v-slot:title>
+              {{post.title}}
             </template>
-          </NoPosts>
-        </template>
-      </div>
-</div>
+            <template v-slot:author>
+              {{post.author}}
+            </template>
+            <template v-slot:time>
+              {{post.updated_at ? post.updated_at : post.created_at}}
+            </template>
+            </PostSummary>
+          </template>
+          <template v-else>
+            <NoPosts>
+              <template v-slot:text>
+                There is no available posts, <router-link :to="{ name: 'home' }"> let's go back!</router-link>
+              </template>
+            </NoPosts>
+          </template>
+        </div>
+  </div>
 </template>
 
 <script>
 import EventService from '../services/EventService'
 import PostSummary from '../components/PostSummary'
-import NoPosts from '../components/NoPosts'
-import ModalAddEdit from '@/components/ModalAddEdit'
-import NotificationConfirm from '@/components/NotificationConfirm'
-import NotificationInfo from '@/components/NotificationInfo'
-import { fetchPostsMixin, deletePostMixin } from '../mixins/fetchPostMixin'
-import { library } from '@fortawesome/fontawesome-svg-core'
+  import NoPosts from '../components/NoPosts'
+  import ModalAddEdit from '@/components/ModalAddEdit'
+  import NotificationConfirm from '@/components/NotificationConfirm'
+  import NotificationInfo from '@/components/NotificationInfo'
+  import { fetchPostsMixin, deletePostMixin, notificationMixin } from '../mixins/fetchPostMixin'
+  import { library } from '@fortawesome/fontawesome-svg-core'
 
-import { faHatWizard } from '@fortawesome/free-solid-svg-icons'
+  import { faHatWizard } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faHatWizard)
+  library.add(faHatWizard)
 
-export default {
-  components: {
-    PostSummary,
-    NoPosts,
-    ModalAddEdit,
-    NotificationConfirm,
-    NotificationInfo
-  },
-  mixins: [fetchPostsMixin, deletePostMixin],
-  data () {
-    return {
-      name: 'PostPage',
-      posts: [],
-      searchInput: '',
-      selectedID: 0,
-      isNotificationOpen: false,
-      isEditOpen: false,
-      email: null,
-      isInfoOpen: false,
-      isInfoPrimary: true
-    }
-  },
-  methods: {
-    search () {
-      EventService.searchEvents(this.searchInput)
-      .then(res => { this.posts = res.data })
-      .catch(err => console.log(err))
+  export default {
+    components: {
+      PostSummary,
+      NoPosts,
+      ModalAddEdit,
+      NotificationConfirm,
+      NotificationInfo
     },
-    deleteSmthng () {
-      this.$notification.parentNode.removeChild(this.$notification);
-      console.log('deletesomething')
-    },
-    // deleteEvent (id) {
-    //   console.log('deleting id', id)
-    //   // EventService.deleteEvent(id)
-    // },
-    toggleOpenEdit(event, boolean) {
-      console.log(event, 'event', boolean, 'bool')
-      if (event) {
-      this.selectedID = event
-      this.isEditOpen = boolean
-      } else {
-      this.selectedID = 0
-      this.isEditOpen = boolean
+    mixins: [fetchPostsMixin, deletePostMixin, notificationMixin],
+    data () {
+      return {
+        name: 'PostPage',
+        posts: [],
+        searchInput: '',
+        selectedID: 0,
+        isNotificationOpen: false,
+        isEditOpen: false,
+        email: null,
+        notificationText: ''
       }
-  },
-    toggleNotification (event, boolean) {
-      console.log('click', event, boolean)
-      this.isNotificationOpen = boolean
-      this.selectedID = event
+    },
+    methods: {
+      search () {
+        EventService.searchEvents(this.searchInput)
+        .then(res => { this.posts = res.data })
+        .catch(err => console.log(err))
+      },
+      deleteSmthng () {
+        this.$notification.parentNode.removeChild(this.$notification);
+        console.log('deletesomething')
+      },
+      // deleteEvent (id) {
+      //   console.log('deleting id', id)
+      //   // EventService.deleteEvent(id)
+      // },
+      toggleOpenEdit(event, boolean) {
+        console.log('posts', this.posts)
+        console.log(event, 'event', boolean, 'bool')
+        if (event) {
+        this.selectedID = event
+        this.isEditOpen = boolean
+        } else {
+        this.selectedID = 0
+        this.isEditOpen = boolean
+        }
+    },
+      toggleNotification (event, boolean) {
+        console.log('click', event, boolean)
+        this.isNotificationOpen = boolean
+        this.selectedID = event
+      }
+    },
+    created () {
+      this.fetchMethod()
+      // EventService.fetchEvents()
+      // .then(res => { this.posts = res.data })
+      // .catch(err => console.log(err))
     }
-  },
-  created () {
-    this.fetchMethod()
-    // EventService.fetchEvents()
-    // .then(res => { this.posts = res.data })
-    // .catch(err => console.log(err))
   }
-}
-</script>
+  </script>

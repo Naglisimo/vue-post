@@ -22,21 +22,35 @@
         @closeConfirmModal="toggleNotification($event, false)"
         @deletePost="deletePost($event)"
         />
+        <NotificationInfo
+        :modalClass="deleteNotification ? 'is-active' : ''"
+        :type="isInfoPrimary ? 'notification is-primary' : 'notification is-danger'">
+        <template v-if="isInfoPrimary === true" v-slot:text> Deleted successfully! </template>
+        <template v-else v-slot:text> Failed to delete! </template>
+        </NotificationInfo>
+        <NotificationInfo
+        :modalClass="addEditNotification ? 'is-active' : ''"
+        :type="isInfoPrimary ? 'notification is-primary' : 'notification is-danger'">
+        <template v-if="isInfoPrimary === true" v-slot:text> Post updated successfully! </template>
+        <template v-else v-slot:text> Failed to update post! </template>
+        </NotificationInfo>
     </div>
 </template>
 
 <script>
 import EventService from '../services/EventService'
 import PostSummary from '@/components/PostSummary.vue'
-import NotificationConfirm from '@/components/NotificationConfirm.vue'
-import { deletePostMixin } from '../mixins/fetchPostMixin'
+import NotificationConfirm from '@/components/NotificationConfirm'
+import NotificationInfo from '@/components/NotificationInfo';
+import { deletePostMixin, notificationMixin } from '../mixins/fetchPostMixin'
 
 export default {
   components: {
     PostSummary,
-    NotificationConfirm
+    NotificationConfirm,
+    NotificationInfo
   },
-  mixins: [deletePostMixin],
+  mixins: [deletePostMixin, notificationMixin],
   props: {
     id: [Number, String]
   },

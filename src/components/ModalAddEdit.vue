@@ -67,15 +67,15 @@
 </template>
 
 <script>
-import { deletePostMixin } from '../mixins/fetchPostMixin'
 import { required } from 'vuelidate/lib/validators'
+import { addEditPostMixin } from '../mixins/fetchPostMixin'
 import EventService from '../services/EventService'
 
   export default {
     props: {
       id: [Number, String]
     },
-    mixins: [deletePostMixin],
+    mixins: [addEditPostMixin],
     data () {
       return {
         isEditing: false,
@@ -83,32 +83,6 @@ import EventService from '../services/EventService'
           author: '',
           postBody: '',
         email: null
-      }
-    },
-    methods: {
-      submitPost () {
-        const date = new Date()
-        const formattedDate = `${date.getFullYear()}-${date.getMonth() + 1 }-${date.getDay()}`
-        
-        const createdEvent = {
-          title: this.title,
-          author: this.author,
-          body: this.postBody,
-          created_at: formattedDate
-        }
-        const updatedEvent = {
-           title: this.title,
-           author: this.author,
-           body: this.postBody,
-           updated_at: formattedDate
-        }
-        if (this.id) { 
-          console.log('updating')
-          EventService.updateEvent(this.id, updatedEvent)
-        } else {
-          EventService.createEvent(createdEvent).then(res => console.log(res)).catch(err => console.log(err))
-        }
-        this.$emit('closeModal')
       }
     },
     watch: {

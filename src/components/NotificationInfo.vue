@@ -1,6 +1,5 @@
 <template>
 <div class="modal" :class="modalClass">
-    <!-- Any other Bulma elements you want -->
 <div :class='type'>
   <slot name="text"></slot>
   </div>
