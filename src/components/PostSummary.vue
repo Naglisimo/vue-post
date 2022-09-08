@@ -43,7 +43,6 @@ export default {
   },
   created () {
     this.path = this.$route.path
-    console.log('created post summary with id', this.id)
   }
 }
 </script>

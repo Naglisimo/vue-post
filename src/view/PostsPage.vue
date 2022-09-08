@@ -1,6 +1,7 @@
 <template>
   <div class="container is-fluid">
     posts page
+    
     <ModalAddEdit 
       :class="[ isEditOpen ? 'is-active' : '']"
       :id="selectedID"
@@ -30,7 +31,7 @@
           :class="isNotificationOpen ? 'is-active' : ''"
           :id="selectedID"
           @closeConfirmModal="toggleNotification($event, false)"
-          @deletePost="deletePost($event)"
+          @deletePost="deletePost($event, currentPage)"
           />
           <NotificationInfo
           :modalClass="deleteNotification ? 'is-active' : ''"
@@ -61,6 +62,13 @@
               {{post.updated_at ? post.updated_at : post.created_at}}
             </template>
             </PostSummary>
+            <nav class="pagination is-centered mt-3" role="navigation" aria-label="pagination">
+              <a v-if="currentPage > 1" class="pagination-previous" @click="prevNext(currentPage--)">Previous</a>
+              <a v-if="currentPage < totalPagesArray.length" class="pagination-next" @click="prevNext(currentPage++)">Next page</a>
+              <ul class="pagination-list">
+                <li v-for="page in totalPagesArray" v-bind:key=page><a class="pagination-link" :class="[page == currentPage ? 'is-current' : '']" @click="toPage(page)" aria-label="Goto page ">{{page}}</a></li>
+              </ul>
+            </nav>
           </template>
           <template v-else>
             <NoPosts>
@@ -96,32 +104,34 @@ import PostSummary from '../components/PostSummary'
       NotificationInfo
     },
     mixins: [fetchPostsMixin, deletePostMixin, notificationMixin],
+    props: {
+      prop: String
+    },
     data () {
       return {
-        name: 'PostPage',
         posts: [],
         searchInput: '',
         selectedID: 0,
         isNotificationOpen: false,
         isEditOpen: false,
-        email: null,
-        notificationText: ''
+        notificationText: '',
+        currentPage: 1,
+        activePage: 0
       }
     },
     methods: {
+      prevNext () {
+        this.toPage(this.currentPage)
+      },
+      toPage (page) {
+        this.currentPage = page
+        this.fetchMethod(page)
+      },
       search () {
         EventService.searchEvents(this.searchInput)
         .then(res => { this.posts = res.data })
         .catch(err => console.log(err))
       },
-      deleteSmthng () {
-        this.$notification.parentNode.removeChild(this.$notification);
-        console.log('deletesomething')
-      },
-      // deleteEvent (id) {
-      //   console.log('deleting id', id)
-      //   // EventService.deleteEvent(id)
-      // },
       toggleOpenEdit(event, boolean) {
         console.log('posts', this.posts)
         console.log(event, 'event', boolean, 'bool')
@@ -140,10 +150,8 @@ import PostSummary from '../components/PostSummary'
       }
     },
     created () {
-      this.fetchMethod()
-      // EventService.fetchEvents()
-      // .then(res => { this.posts = res.data })
-      // .catch(err => console.log(err))
+      this.fetchMethod(this.currentPage)
+      console.log('props are', this.prop)
     }
   }
   </script>

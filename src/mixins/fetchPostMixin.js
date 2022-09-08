@@ -2,19 +2,39 @@ import router from "@/router"
 import EventService from "@/services/EventService"
 
 export const fetchPostsMixin = {
+  data () {
+    return {
+      totalPagesArray: []
+    }
+  },
   methods: {
-    fetchMethod () {
-      console.log('fetch was executed')
-      EventService.fetchEvents()
-        .then(res => { this.posts = res.data })
-        .catch(err => console.log(err))
+    paginate (res) {
+      this.totalPages = res.headers.link.split(',').map(arr => arr.split(';'))
+      const lastPage = this.totalPages.map(arr => arr.map(inner => { if (inner.match(/last/)) { return arr } })).flat().filter(arr => arr !== undefined).flat()
+      if (lastPage.length) {
+        const lastPageNumber = lastPage[0].match(/page=([0-9])/)[1]
+        this.totalPagesArray = []
+        for (let i = 1; i <= lastPageNumber; i++) {
+          this.totalPagesArray.push(i)
+        }
+      } else { this.totalPagesArray }
+      this.posts = res.data
+    },
+    fetchMethod (page) {
+      EventService.fetchEvents(page !== undefined ? page : 1)
+        .then(res => {
+          this.paginate(res)
+        })
+        .catch(err => {
+          this.openNotificationDanger(err)
+        })
     }
   }
 }
 
 export const deletePostMixin = {
   methods: {
-    deletePost (id) {
+    deletePost (id, currentPage) {
       EventService.deleteEvent(id)
         .then(() => {
           if (this.$route.name !== 'home') {
@@ -28,12 +48,11 @@ export const deletePostMixin = {
             }, 2000)
           } else {
             this.isNotificationOpen = false
-            this.fetchMethod()
+            this.fetchMethod(currentPage)
           }
           this.openNotificationPrimary('Post deleted!')
         })
         .catch(() => {
-          console.log('error')
           this.openNotificationDanger('Post failed to delete!')
         })
     }
@@ -64,8 +83,7 @@ export const addEditPostMixin = {
           body: this.postBody,
           created_at: formattedDate
         }
-        EventService.createEvent(createdEvent).then(res => {
-          console.log(res)
+        EventService.createEvent(createdEvent).then(() => {
           this.$emit('fetchData')
           this.$emit('alertPrimary', 'Post created successfully!')
         }).catch(() => this.$emit('alertDanger', 'Failed to create post!'))
@@ -94,7 +112,6 @@ export const notificationMixin = {
       }, 2000)
     },
     openNotificationDanger (notificationText) {
-      console.log('danger function')
       this.notificationText = notificationText
       this.deleteNotification = true
       this.isInfoPrimary = false

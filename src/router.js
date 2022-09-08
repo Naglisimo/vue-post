@@ -13,7 +13,8 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      component: PostsPage
+      component: PostsPage,
+      props: true
     },
     {
       path: '/post/:id',
