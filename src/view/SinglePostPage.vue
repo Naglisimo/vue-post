@@ -1,7 +1,16 @@
 <template>
     <div class="section">
+      <ModalAddEdit 
+      :class="[ isEditOpen ? 'is-active' : '']"
+      :id="id"
+      @closeModal="toggleOpenEdit(false)"
+      @deletePost="deletePost($event)"
+      @fetchData="fetchMethod()"
+      @alertPrimary="openNotificationPrimary($event)"
+      @alertDanger="openNotificationDanger($event)"/>
         <PostSummary
         @openConfirmModal="toggleNotification($event, true)"
+        @openAddEdit="toggleOpenEdit($event, true)"
         :id="id">
           <template v-slot:title>
             {{post.title}}
@@ -41,14 +50,16 @@
 import EventService from '../services/EventService'
 import PostSummary from '@/components/PostSummary.vue'
 import NotificationConfirm from '@/components/NotificationConfirm'
-import NotificationInfo from '@/components/NotificationInfo';
+import NotificationInfo from '@/components/NotificationInfo'
+import ModalAddEdit from '@/components/ModalAddEdit'
 import { deletePostMixin, notificationMixin } from '../mixins/fetchPostMixin'
 
 export default {
   components: {
     PostSummary,
     NotificationConfirm,
-    NotificationInfo
+    NotificationInfo,
+    ModalAddEdit
   },
   mixins: [deletePostMixin, notificationMixin],
   props: {
@@ -58,19 +69,29 @@ export default {
     return {
       name: 'SinglePostPage',
       post: [],
-      isNotificationOpen: false
+      isNotificationOpen: false,
+      isEditOpen: false,
     }
   },
   methods: {
       toggleNotification (event, boolean) {
-      console.log('click', event, boolean)
       this.isNotificationOpen = boolean
       this.selectedID = event
-    }
+    },
+    toggleOpenEdit(event, boolean) {
+        if (event) {
+        this.selectedID = event
+        this.isEditOpen = boolean
+        } else {
+        this.selectedID = 0
+        this.isEditOpen = boolean
+        }
+    },
   },
   async created () {
-    const res = await EventService.fetchEvent(this.id)
-    return this.post=res.data
+    await EventService.fetchEvent(this.id)
+      .then(res => this.post = res.data)
+      .catch(() => this.$router.push({ name: '404' }))
   }
 }
 </script>

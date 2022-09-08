@@ -9,7 +9,7 @@
     <section class="modal-card-body">
 
 <div class="field">
-  <label class="label">Post title</label>
+  <label class="label">Post title {{ id }}</label>
   <div class="control">
     <input 
       class="input"
@@ -87,6 +87,7 @@ import EventService from '../services/EventService'
     },
     watch: {
       id(newId, oldId) {
+        console.log('watcher', newId, oldId)
         if (newId !== oldId && newId) {
           EventService.fetchEvent(this.id).then( ({data}) => {
           this.title = data.title

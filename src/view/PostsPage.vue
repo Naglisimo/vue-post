@@ -1,7 +1,5 @@
 <template>
   <div class="container is-fluid">
-    posts page
-    
     <ModalAddEdit 
       :class="[ isEditOpen ? 'is-active' : '']"
       :id="selectedID"
@@ -16,12 +14,12 @@
             class="button is-info is-light"
             @click="toggleOpenEdit(0, true)"> Add new post </button>
         </div>
-        <div class="field has-addons ">
-          <p class="control">
+        <div class="field has-addons">
+          <p class="control ">
             <input @onChange="search" class="input" type="text" placeholder="Find a post" v-model="searchInput">
           </p>
           <p class="control">
-            <button class="button" @click="search">
+            <button class="button is-info is-light" @click="search">
               Search
             </button>
           </p>
@@ -130,11 +128,9 @@ import PostSummary from '../components/PostSummary'
       search () {
         EventService.searchEvents(this.searchInput)
         .then(res => { this.posts = res.data })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err)) // redirectint į 404 puslapį
       },
       toggleOpenEdit(event, boolean) {
-        console.log('posts', this.posts)
-        console.log(event, 'event', boolean, 'bool')
         if (event) {
         this.selectedID = event
         this.isEditOpen = boolean
@@ -144,14 +140,12 @@ import PostSummary from '../components/PostSummary'
         }
     },
       toggleNotification (event, boolean) {
-        console.log('click', event, boolean)
         this.isNotificationOpen = boolean
         this.selectedID = event
       }
     },
     created () {
       this.fetchMethod(this.currentPage)
-      console.log('props are', this.prop)
     }
   }
   </script>
